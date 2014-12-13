@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>851</width>
+    <height>501</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="3" column="0">
+     <widget class="options" name="widget_2" native="true"/>
+    </item>
+    <item row="2" column="0">
+     <widget class="packets" name="widget" native="true"/>
+    </item>
+    <item row="4" column="0">
+     <widget class="addoption" name="widget_3" native="true"/>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>851</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuMenu">
+    <property name="title">
+     <string>Menu</string>
+    </property>
+    <addaction name="actionView_packets"/>
+    <addaction name="actionView_options"/>
+    <addaction name="actionAdd_option"/>
+   </widget>
+   <addaction name="menuMenu"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionView_packets">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>view packets</string>
+   </property>
+  </action>
+  <action name="actionView_options">
+   <property name="text">
+    <string>view options</string>
+   </property>
+  </action>
+  <action name="actionAdd_option">
+   <property name="text">
+    <string>add option</string>
+   </property>
+  </action>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>packets</class>
+   <extends>QWidget</extends>
+   <header>packets.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>options</class>
+   <extends>QWidget</extends>
+   <header>options.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>addoption</class>
+   <extends>QWidget</extends>
+   <header>addoption.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
