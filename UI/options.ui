@@ -31,6 +31,9 @@
    </item>
    <item row="0" column="0" alignment="Qt::AlignLeft">
     <widget class="QPushButton" name="refresh">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
      <property name="minimumSize">
       <size>
        <width>30</width>
@@ -47,8 +50,8 @@
       <string/>
      </property>
      <property name="icon">
-      <iconset>
-       <normaloff>../../../../../Users/Thomas/Desktop/22969.png</normaloff>../../../../../Users/Thomas/Desktop/22969.png</iconset>
+      <iconset resource="img/ui.qrc">
+       <normaloff>:/refresh_icon.png</normaloff>:/refresh_icon.png</iconset>
      </property>
      <property name="iconSize">
       <size>
@@ -60,6 +63,8 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="img/ui.qrc"/>
+ </resources>
  <connections/>
 </ui>

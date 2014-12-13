@@ -31,3 +31,6 @@ FORMS    += \
     options.ui \
     packets.ui \
     addoption.ui
+
+RESOURCES += \
+    img/ui.qrc
