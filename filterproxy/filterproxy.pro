@@ -1,11 +1,14 @@
-SOURCES = filterproxy.cpp
+SOURCES = filterproxy.cpp \
+    filterproxyapp.cpp \
+    main.cpp
 
 QT += network
 
 CONFIG += c++11
 
 HEADERS += \
-    filterproxy.h
+    filterproxy.h \
+    filterproxyapp.h
 
 OTHER_FILES += \
     libssl.a
