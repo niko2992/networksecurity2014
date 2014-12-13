@@ -2,7 +2,7 @@
 #define ADDOPTION_H
 
 #include <QWidget>
-#include <Qtimer>
+#include <QTimer>
 
 namespace Ui {
 class addoption;

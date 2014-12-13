@@ -13,14 +13,12 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp \
-    mainWindow.cpp \
     mainwindow.cpp \
     options.cpp \
     packets.cpp \
     addoption.cpp
 
 HEADERS  += \
-    mainWindow.h \
     mainwindow.h \
     options.h \
     packets.h \
