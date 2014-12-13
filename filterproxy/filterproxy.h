@@ -26,7 +26,8 @@
 struct RuleType {
     enum type {
         block,
-        transform
+        transform,
+        unknown
     };
 };
 

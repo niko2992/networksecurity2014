@@ -1,38 +1,55 @@
 #include "filterproxy.h"
 
+#include <QFileSystemWatcher>
+#include <functional>
+
+#define BLOCK_FILE     QByteArray("block.txt")
+#define TRANSFORM_FILE QByteArray("transform.txt")
+
+RuleType::type ruleTypeFromFilename(QString filePath)
+{
+    QFileInfo fileInfo(filePath);
+    QString   fileName = fileInfo.fileName();
+
+    if (fileName == "blacklist.txt")
+      return RuleType::block;
+    if (fileName == "transform.txt")
+      return RuleType::transform;
+    return RuleType::unknown;
+}
+
+class FilterProxyApp
+{
+public:
+private:
+};
+
 int main(int argc, char *argv[])
 {
-    QCoreApplication app(argc, argv);
+    QCoreApplication   app(argc, argv);
+    QFileSystemWatcher fileSystemWatcher;
     FilterProxy proxy;
 
-    QFile file;
-    file.setFileName(":/blacklist.txt");
-    if (!file.open(QFile::ReadOnly)) {
-        qCritical() << "Can't access saved filter rules!";
-        return 0;
-    }
-    QString blockRules = file.readAll();
-    file.close();
+    std::function<void (QString)> loadRuleFile = [&proxy](QString filePath)
+    {
+      QFile file(filePath);
 
-    QStringList rules = blockRules.split('\n');
-    rules.removeAll("");
+      if (file.open(QFile::ReadOnly))
+      {
+        QString        rules    = file.readAll();
+        QStringList    ruleList = rules.split('\n');
+        RuleType::type ruleType = ruleTypeFromFilename(filePath);
 
-    proxy.addRules(RuleType::block, rules);
+        ruleList.removeAll("");
+        proxy.addRules(ruleType, ruleList);
+      }
+      file.close();
+    };
 
+    fileSystemWatcher.addPaths(QStringList() << QFileInfo(BLOCK_FILE).absoluteFilePath() << QFileInfo(TRANSFORM_FILE).absoluteFilePath());
+    QObject::connect(&fileSystemWatcher, &QFileSystemWatcher::fileChanged, loadRuleFile);
 
-    QFile file2;
-    file2.setFileName(":/transform.txt");
-    if (!file2.open(QFile::ReadOnly)) {
-        qCritical() << "Can't access saved transform rules!";
-        return 0;
-    }
-    QString transformRules = file2.readAll();
-    file2.close();
-
-    rules = transformRules.split('\n');
-    rules.removeAll("");
-
-    proxy.addRules(RuleType::transform, rules);
-
+    loadRuleFile(BLOCK_FILE);
+    loadRuleFile(TRANSFORM_FILE);
     return app.exec();
 }
