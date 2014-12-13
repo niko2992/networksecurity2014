@@ -23,19 +23,20 @@
 //#include <QSsl>
 //#include <QSslSocket>
 
+struct RuleType {
+    enum type {
+        block,
+        transform
+    };
+};
+
 class FilterProxy: public QObject
 {
     Q_OBJECT
 
-    struct RuleType {
-        enum RuleType {
-            block,
-            transform
-        };
-    };
 private:
     QStringList blockRules;
-    QList<QPair<QString, QString>> transformRules;
+    QList<QPair<QString, QString> > transformRules;
 
     bool blockedURL(const QUrl &url) {
         QString s = url.toString(QUrl::RemoveScheme |
@@ -43,7 +44,7 @@ private:
                                  QUrl::RemoveUserInfo);
         if (s.startsWith("//"))
             s.remove(0, 2);
-        foreach (const QString &rule, urlRules)
+        foreach (const QString &rule, blockRules)
             if (s.startsWith(rule))
                 return true;
         return false;
@@ -51,7 +52,7 @@ private:
 
     QUrl transformURL(const QUrl &url)
     {
-        QUrl ret;
+        QUrl ret = url;
 
 //        foreach (const QString &rule, urlRules)
 //            if (s.startsWith(rule))
@@ -70,7 +71,7 @@ public:
         qDebug() << "Proxy server running at port" << proxyServer->serverPort();
     }
 
-    QString cleanRule(const Qstring &r)
+    QString cleanRule(const QString &r)
     {
         QString rule = r;
 
@@ -93,41 +94,56 @@ public:
         return ret;
     }
 
-    void addRule(RuleType type, const QString &r) {
-        QList *ruleList;
-        void *rule;
-
+    void addRule(RuleType::type type, const QString &r) {
         switch (type)
         {
         case RuleType::block:
-            ruleList = blockRules;
-            rule = cleanRule(r);
+        {
+            QString rule = cleanRule(r);
+
             if (rule.isEmpty())
             {
                 qDebug() << "Incorrect block rule skipped";
                 return;
             }
+
+            if (!blockRules.contains(rule))
+            {
+                blockRules += rule;
+                qDebug() << "Block rule added:" + rule;
+            }
             break;
+        }
         case RuleType::transform:
-            ruleList = transformRules;
+        {
             QStringList ruleParts = cleanRules(r.split(" "));
+
             if (ruleParts.count() != 2 || ruleParts[0].isEmpty() || ruleParts[1].isEmpty())
             {
                 qDebug() << "Incorrect transform rule skipped";
                 return;
             }
-            rule = new QPair<QString, QString>(ruleParts[0], ruleParst[1]);
+
+            QPair<QString, QString> rule = QPair<QString, QString>(ruleParts[0], ruleParts[1]);
+
+            if (!transformRules.contains(rule))
+            {
+                transformRules += rule;
+                qDebug() << "Transform rule added:" + ruleParts[0] + "->" + ruleParts[1];
+            }
             break;
-        default:
-            qDebug() << "Unhandled rule type";
         }
-        if (!ruleList.contains(rule))
-            ruleList += rule;
+        default:
+        {
+            qDebug() << "Unhandled rule type";
+            break;
+        }
+        }
     }
 
-    void addRules(RuleType type, const QStringList &rules) {
+    void addRules(RuleType::type type, const QStringList &rules) {
         foreach (QString rule, rules)
-            addRule(rule);
+            addRule(type, rule);
     }
 
 private slots:

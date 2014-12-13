@@ -3,6 +3,7 @@
 int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
+    FilterProxy proxy;
 
     QFile file;
     file.setFileName(":/blacklist.txt");
@@ -13,17 +14,25 @@ int main(int argc, char *argv[])
     QString blockRules = file.readAll();
     file.close();
 
+    QStringList rules = blockRules.split('\n');
+    rules.removeAll("");
+
+    proxy.addRules(RuleType::block, rules);
+
+
     QFile file2;
     file2.setFileName(":/transform.txt");
-    if (!file2open(QFile::ReadOnly)) {
+    if (!file2.open(QFile::ReadOnly)) {
         qCritical() << "Can't access saved transform rules!";
         return 0;
     }
     QString transformRules = file2.readAll();
     file2.close();
 
-    FilterProxy proxy;
-    proxy.addRules(FilterProxy::RuleType::block, blockRules.split('\n'));
-    proxy.addRules(FilterProxy::RuleType::transform, transformRules.split('\n'));
+    rules = transformRules.split('\n');
+    rules.removeAll("");
+
+    proxy.addRules(RuleType::transform, rules);
+
     return app.exec();
 }
