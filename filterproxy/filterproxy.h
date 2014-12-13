@@ -20,8 +20,6 @@
 */
 
 #include <QtNetwork>
-//#include <QSsl>
-//#include <QSslSocket>
 
 struct RuleType {
     enum type {
@@ -38,27 +36,50 @@ private:
     QStringList blockRules;
     QList<QPair<QString, QString> > transformRules;
 
-    bool blockedURL(const QUrl &url) {
+    bool applyBlockURLRules(const QUrl &url) {
         QString s = url.toString(QUrl::RemoveScheme |
                                  QUrl::RemovePassword |
                                  QUrl::RemoveUserInfo);
+
         if (s.startsWith("//"))
             s.remove(0, 2);
+
         foreach (const QString &rule, blockRules)
+        {
             if (s.startsWith(rule))
+            {
+                qDebug() << "Block rule blocked following URL: " << s;
                 return true;
+            }
+        }
         return false;
     }
 
-    QUrl transformURL(const QUrl &url)
+    bool applyTransformURLRules(QUrl &url)
     {
-        QUrl ret = url;
+//        QString pattern = ".*\\.jpg";
+//        QString replace = "http://web-tech.fr/wp-content/uploads/2012/04/trollface1.jpg";
+//        QRegExp reg = QRegExp(pattern);
+        bool changed = false;
+        typedef QPair<QString, QString> Rule;
 
-//        foreach (const QString &rule, urlRules)
-//            if (s.startsWith(rule))
-//                return true;
+        foreach (const Rule &rule, transformRules)
+        {
+            QString save = url.toString();
 
-        return ret;
+            qDebug() << "debug##" << rule.first << "##" << rule.second;
+            url = url.toString().replace(QRegExp(rule.first), rule.second);
+
+            if (url.toString() != save)
+            {
+                qDebug() << "Transform rule transformed following URL: " << save << " to: " << url.toString();
+                changed = true;
+            }
+        }
+        if (changed)
+            return true;
+        else
+            return false;
     }
 
 public:
@@ -71,25 +92,29 @@ public:
         qDebug() << "Proxy server running at port" << proxyServer->serverPort();
     }
 
-    QString cleanRule(const QString &r)
+    QString cleanRule(const QString &r, bool deleteHttpPrefix = true)
     {
         QString rule = r;
 
         rule = rule.simplified();
-        if (rule.startsWith("http://"))
-            rule.remove(0, 7);
-        if (rule.startsWith("https://"))
-            rule.remove(0, 8);
+
+        if (deleteHttpPrefix)
+        {
+            if (rule.startsWith("http://"))
+                rule.remove(0, 7);
+            if (rule.startsWith("https://"))
+                rule.remove(0, 8);
+        }
 
         return rule;
     }
 
-    QStringList cleanRules(const QStringList &l)
+    QStringList cleanRules(const QStringList &l, bool deleteHttpPrefix = true)
     {
         QStringList ret;
 
         foreach (const QString &r, l)
-            ret.append(cleanRule(r));
+            ret.append(cleanRule(r, deleteHttpPrefix));
 
         return ret;
     }
@@ -110,13 +135,13 @@ public:
             if (!blockRules.contains(rule))
             {
                 blockRules += rule;
-                qDebug() << "Block rule added:" + rule;
+                qDebug() << "Block rule added:" << rule;
             }
             break;
         }
         case RuleType::transform:
         {
-            QStringList ruleParts = cleanRules(r.split(" "));
+            QStringList ruleParts = cleanRules(r.split(" "), false);
 
             if (ruleParts.count() != 2 || ruleParts[0].isEmpty() || ruleParts[1].isEmpty())
             {
@@ -129,7 +154,7 @@ public:
             if (!transformRules.contains(rule))
             {
                 transformRules += rule;
-                qDebug() << "Transform rule added:" + ruleParts[0] + "->" + ruleParts[1];
+                qDebug() << "Transform rule added:" << ruleParts[0] << " -> " + ruleParts[1];
             }
             break;
         }
@@ -148,7 +173,7 @@ public:
 
 private slots:
     void manageQuery() {
-        qDebug() << "new connection";
+        //qDebug() << "new connection";
         QTcpServer *proxyServer = qobject_cast<QTcpServer*>(sender());
         QTcpSocket *socket = proxyServer->nextPendingConnection();
         connect(socket, SIGNAL(readyRead()), this, SLOT(processQuery()));
@@ -156,7 +181,7 @@ private slots:
     }
 
     void processQuery() {
-        qDebug() << "new query";
+        //qDebug() << "new query";
         QTcpSocket *socket = qobject_cast<QTcpSocket*>(sender());
         QByteArray requestData = socket->readAll();
 
@@ -176,20 +201,19 @@ private slots:
             socket->disconnectFromHost();
             return;
         }
-        if (blockedURL(url)) {
-            qWarning() << "Blocked URL:" << url;
+        if (applyBlockURLRules(url)) {
             socket->disconnectFromHost();
             return;
         }
 
-        url = transformURL(url);
+        applyTransformURLRules(url);
 
-        if (blockedURL(url)) {
-            qWarning() << "Blocked URL:" << url;
+        if (applyBlockURLRules(url)) {
             socket->disconnectFromHost();
             return;
         }
-        qDebug() << "proxy URL:" << url;
+
+        qDebug() << "Proxying URL:" << url;
 
         QString host = url.host();
         int port = (url.port() < 0) ? 80 : url.port();

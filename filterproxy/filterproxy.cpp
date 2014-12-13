@@ -6,7 +6,7 @@ int main(int argc, char *argv[])
     FilterProxy proxy;
 
     QFile file;
-    file.setFileName(":/blacklist.txt");
+    file.setFileName(":/block.txt");
     if (!file.open(QFile::ReadOnly)) {
         qCritical() << "Can't access saved filter rules!";
         return 0;
