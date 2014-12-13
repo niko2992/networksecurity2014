@@ -1,0 +1,1 @@
+*.jpg http://web-tech.fr/wp-content/uploads/2012/04/trollface1.jpg

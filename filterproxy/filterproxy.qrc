@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>blacklist.txt</file>
+        <file>transform.txt</file>
+    </qresource>
+</RCC>
