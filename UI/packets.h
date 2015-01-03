@@ -2,7 +2,9 @@
 #define PACKETS_H
 
 #include <QWidget>
+#include <QListWidgetItem>
 #include <QTimer>
+#include <QFlags>
 
 namespace Ui {
 class packets;
@@ -24,6 +26,8 @@ private slots:
     void showPackets();
     void startStop();
     void clearPacketList();
+    void editPacket(QListWidgetItem*);
+    void resendPacket();
 };
 
 #endif // PACKETS_H

@@ -11,6 +11,8 @@ packets::packets(QWidget *parent) :
     connect(ui->clear, SIGNAL(clicked()), this, SLOT(clearPacketList()));
     connect(ui->startStop, SIGNAL(clicked()), this, SLOT(startStop()));
     connect(&timer, SIGNAL(timeout()), this, SLOT(showPackets()));
+    connect(ui->packetList, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(editPacket(QListWidgetItem*)));
+    connect(ui->resend, SIGNAL(clicked()), this, SLOT(resendPacket()));
 }
 
 packets::~packets()
@@ -25,6 +27,7 @@ void packets::startStop()
     {
         timer.stop();
         ui->startStop->setText("Start");
+        started = false;
     }
     else
     {
@@ -38,12 +41,25 @@ static int i = 0;
 void packets::showPackets()
 {
    ui->packetList->insertItem(0, "test" + QString::number(i));
-   ui->packetList->insertItem(0, "tesqewqwet");
-   ui->packetList->insertItem(0, "teqweqwes1221t");
    i++;
 }
 
 void packets::clearPacketList()
 {
     ui->packetList->clear();
+}
+
+void packets::editPacket(QListWidgetItem *item)
+{
+    item->setFlags(item->flags() | Qt::ItemIsEditable);
+}
+
+#include <QDebug>
+void packets::resendPacket()
+{
+    QListWidgetItem* item = ui->packetList->currentItem();
+    if (item)
+        qDebug() << "Packet send again : " << item->text();
+    else
+        qDebug() << "Nothing selected";
 }
