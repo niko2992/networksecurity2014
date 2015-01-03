@@ -20,6 +20,7 @@
 */
 
 #include <QtNetwork>
+#define PROXY_DEFAULT_PORT 8080
 
 struct RuleType {
     enum type {
@@ -88,10 +89,12 @@ public:
         : QObject(parent)
     {
         QTcpServer *proxyServer = new QTcpServer(this);
-        proxyServer->listen(QHostAddress::Any, 8080);
+        proxyServer->listen(QHostAddress::Any, getPort());
         connect(proxyServer, SIGNAL(newConnection()), this, SLOT(manageQuery()));
         qDebug() << "Proxy server running at port" << proxyServer->serverPort();
     }
+
+    unsigned short getPort(void) const;
 
     QString cleanRule(const QString &r, bool deleteHttpPrefix = true)
     {
