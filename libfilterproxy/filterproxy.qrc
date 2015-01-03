@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>block.txt</file>
+        <file>transform.txt</file>
+        <file>color.txt</file>
+    </qresource>
+</RCC>

@@ -1,5 +1,5 @@
-#include "filterproxy.h"
-#include "filterproxyapp.h"
+#include "../libfilterproxy/filterproxy.h"
+#include "../libfilterproxy/filterproxyapp.h"
 
 int main(int argc, char *argv[])
 {
@@ -11,4 +11,3 @@ int main(int argc, char *argv[])
     proxyApp.addFilterFile(TRANSFORM_FILE);
     return app.exec();
 }
-

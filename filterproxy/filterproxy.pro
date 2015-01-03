@@ -1,20 +1,18 @@
-SOURCES = filterproxy.cpp \
-    filterproxyapp.cpp \
-    main.cpp
+SOURCES = main.cpp
 
 QT += network
 
 CONFIG += c++11
-
-HEADERS += \
-    filterproxy.h \
-    filterproxyapp.h
 
 OTHER_FILES += \
     libssl.a
 
 unix:  LIBS += -lssl
 win32: LIBS += "C:\Users\ce-nicolas.brochard\Desktop\Perso\Formation\Network security\GIT\filterproxy\libssl.a"
+
+unix:  LIBS += ../lib/libfilterproxy.so
+win32: LIBS += ../lib/libfilterproxy.dll
+
 #.\libssl.a
 
 FILTER_FILES = block.txt transform.txt
