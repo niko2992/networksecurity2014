@@ -1,7 +1,6 @@
 #include "filterproxy.h"
 
-FilterProxy::FilterProxy(QObject *parent)
-    : QObject(parent)
+FilterProxy::FilterProxy(QObject *parent) : QObject(parent)
 {
     QTcpServer *proxyServer = new QTcpServer(this);
     proxyServer->listen(QHostAddress::Any, getPort());
@@ -168,7 +167,7 @@ QString FilterProxy::socketNameFromUrl(const QUrl &url) {
 QTcpSocket* FilterProxy::socketFromUrl(QTcpSocket* client, const QUrl &url) {
     QString name = socketNameFromUrl(url);
 
-    if (protocolFromUrl(url))
+    if (protocolFromUrl(url) == https)
       return client->findChild<QSslSocket*>(name);
     return client->findChild<QTcpSocket*>(name);
 }
