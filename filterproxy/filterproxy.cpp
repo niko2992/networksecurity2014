@@ -175,6 +175,8 @@ QTcpSocket* FilterProxy::socketFromUrl(QTcpSocket* client, const QUrl &url) {
 
 FilterProxy::Protocol FilterProxy::protocolFromUrl(const QUrl &url)
 {
+    if (url.port() == 443)
+      return https;
     return (url.scheme().contains("https", Qt::CaseInsensitive)) ? https : http;
 }
 
