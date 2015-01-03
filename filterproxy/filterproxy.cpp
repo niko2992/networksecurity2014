@@ -161,6 +161,30 @@ void FilterProxy::manageQuery() {
     connect(socket, SIGNAL(disconnected()), socket, SLOT(deleteLater()));
 }
 
+QString FilterProxy::socketNameFromUrl(const QUrl &url) {
+    return url.host() + ':' + QString::number(url.port());
+}
+
+QTcpSocket* FilterProxy::socketFromUrl(QTcpSocket* client, const QUrl &url) {
+    QString name = socketNameFromUrl(url);
+
+    if (protocolFromUrl(url))
+      return client->findChild<QSslSocket*>(name);
+    return client->findChild<QTcpSocket*>(name);
+}
+
+FilterProxy::Protocol FilterProxy::protocolFromUrl(const QUrl &url)
+{
+    return (url.scheme().contains("https", Qt::CaseInsensitive)) ? https : http;
+}
+
+unsigned short FilterProxy::portFromUrl(const QUrl &url)
+{
+    int port = url.port();
+
+    return port < 0 ? 80 : port;
+}
+
 void FilterProxy::processQuery() {
     //qDebug() << "new query";
     QTcpSocket *socket = qobject_cast<QTcpSocket*>(sender());
@@ -191,56 +215,61 @@ void FilterProxy::processQuery() {
 
     qDebug() << "Proxying URL:" << url;
 
-    QString host = url.host();
-    int port = (url.port() < 0) ? 80 : url.port();
     QByteArray req = url.toEncoded();
 
     requestLine = method + " " + req + " " + version + "\r\n";
     requestData.prepend(requestLine);
 
-    QString key = host + ':' + QString::number(port);
+    QTcpSocket* proxySocket = socketFromUrl(socket, url);
 
-    if (port == 443)
+    if (proxySocket)
     {
-        QSslSocket *proxySocket = socket->findChild<QSslSocket*>(key);
-        if (proxySocket) {
-            proxySocket->setObjectName(key);
-            proxySocket->setProperty("url", url);
-            proxySocket->setProperty("requestData", requestData);
-            proxySocket->write(requestData);
-        } else {
-            proxySocket = new QSslSocket(socket);
-            proxySocket->setObjectName(key);
-            proxySocket->setProperty("url", url);
-            proxySocket->setProperty("requestData", requestData);
-            connect(proxySocket, SIGNAL(connected()), this, SLOT(sendRequest()));
-            connect(proxySocket, SIGNAL(readyRead()), this, SLOT(transferData()));
-            connect(proxySocket, SIGNAL(disconnected()), this, SLOT(closeConnection()));
-            connect(proxySocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(closeConnection()));
-            proxySocket->connectToHostEncrypted(host, port);
-            //proxySocket->connectToHost(host, port);
-        }
+        proxySocket->setProperty("url", url);
+        proxySocket->setProperty("requestData", requestData);
+        proxySocket->write(requestData);
     }
     else
+        openConnection(socket, url, requestData);
+}
+
+void FilterProxy::initializeSocket(QTcpSocket* socket, const QUrl& url, const QByteArray& requestData)
+{
+    socket->setObjectName(socketNameFromUrl(url));
+    socket->setProperty("url", url);
+    socket->setProperty("requestData", requestData);
+    connect(socket, SIGNAL(connected()), this, SLOT(sendRequest()));
+    connect(socket, SIGNAL(readyRead()), this, SLOT(transferData()));
+    connect(socket, SIGNAL(disconnected()), this, SLOT(closeConnection()));
+    connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(closeConnection()));
+}
+
+void FilterProxy::openConnection(QTcpSocket* client, const QUrl& url, const QByteArray& requestData)
+{
+    switch (protocolFromUrl(url))
     {
-        QTcpSocket *proxySocket = socket->findChild<QTcpSocket*>(key);
-        if (proxySocket) {
-            proxySocket->setObjectName(key);
-            proxySocket->setProperty("url", url);
-            proxySocket->setProperty("requestData", requestData);
-            proxySocket->write(requestData);
-        } else {
-            proxySocket = new QTcpSocket(socket);
-            proxySocket->setObjectName(key);
-            proxySocket->setProperty("url", url);
-            proxySocket->setProperty("requestData", requestData);
-            connect(proxySocket, SIGNAL(connected()), this, SLOT(sendRequest()));
-            connect(proxySocket, SIGNAL(readyRead()), this, SLOT(transferData()));
-            connect(proxySocket, SIGNAL(disconnected()), this, SLOT(closeConnection()));
-            connect(proxySocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(closeConnection()));
-            proxySocket->connectToHost(host, port);
-        }
+    case http:
+        openUnencryptedConnection(client, url, requestData);
+        break ;
+    case https:
+        openEncryptedConnection  (client, url, requestData);
+        break ;
     }
+}
+
+void FilterProxy::openEncryptedConnection(QTcpSocket* client, const QUrl &url, const QByteArray &requestData)
+{
+    QSslSocket* socket = new QSslSocket(client);
+
+    initializeSocket(socket, url, requestData);
+    socket->connectToHostEncrypted(url.host(), portFromUrl(url));
+}
+
+void FilterProxy::openUnencryptedConnection(QTcpSocket* client, const QUrl &url, const QByteArray &requestData)
+{
+    QTcpSocket* socket = new QTcpSocket(client);
+
+    initializeSocket(socket, url, requestData);
+    socket->connectToHost(url.host(), portFromUrl(url));
 }
 
 void FilterProxy::sendRequest() {

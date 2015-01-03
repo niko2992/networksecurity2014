@@ -36,6 +36,12 @@ class FilterProxy: public QObject
 
     QStringList blockRules;
     QList<QPair<QString, QString> > transformRules;
+
+    enum Protocol {
+        http,
+        https
+    };
+
 public:
     FilterProxy(QObject *parent = 0);
 
@@ -57,6 +63,15 @@ private slots:
     void sendRequest();
     void transferData();
     void closeConnection();
+    void initializeSocket(QTcpSocket* socket, const QUrl& url, const QByteArray& requestData);
+    void openConnection(QTcpSocket* client, const QUrl& url, const QByteArray& requestData);
+    void openEncryptedConnection  (QTcpSocket* client, const QUrl& url, const QByteArray& requestData);
+    void openUnencryptedConnection(QTcpSocket* client, const QUrl& url, const QByteArray& requestData);
+
+    static QTcpSocket*    socketFromUrl(QTcpSocket* client, const QUrl& url);
+    static QString        socketNameFromUrl(const QUrl& url);
+    static Protocol       protocolFromUrl(const QUrl& url);
+    static unsigned short portFromUrl(const QUrl& url);
 };
 
 #endif // FILTERPROXY_H
