@@ -32,7 +32,7 @@
       <property name="bottomMargin">
        <number>0</number>
       </property>
-      <item row="0" column="0" colspan="5">
+      <item row="0" column="0" colspan="6">
        <widget class="QListWidget" name="packetList"/>
       </item>
       <item row="1" column="2" alignment="Qt::AlignHCenter">
@@ -86,7 +86,7 @@
         </property>
        </spacer>
       </item>
-      <item row="1" column="4">
+      <item row="1" column="5">
        <spacer name="horizontalSpacer_4">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -98,6 +98,25 @@
          </size>
         </property>
        </spacer>
+      </item>
+      <item row="1" column="4">
+       <widget class="QPushButton" name="resend">
+        <property name="minimumSize">
+         <size>
+          <width>150</width>
+          <height>25</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>150</width>
+          <height>25</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Resend</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
