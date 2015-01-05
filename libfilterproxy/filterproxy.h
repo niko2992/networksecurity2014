@@ -60,6 +60,8 @@ signals:
 private:
     bool applyBlockURLRules(const QUrl &url);
     bool applyTransformURLRules(QUrl &url);
+    void addBlockRule(const QString& r);
+    void addTransformRule(const QString& r);
 
 private slots:
     void manageQuery();
