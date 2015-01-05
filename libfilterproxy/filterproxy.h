@@ -50,7 +50,7 @@ public:
     QString cleanRule(const QString &r, bool deleteHttpPrefix = true);
     QStringList cleanRules(const QStringList &l, bool deleteHttpPrefix = true);
 
-    void addRule(RuleType::type type, const QString &r);
+    bool addRule(RuleType::type type, const QString &r);
     void addRules(RuleType::type type, const QStringList &rules);
 
 signals:
@@ -60,8 +60,8 @@ signals:
 private:
     bool applyBlockURLRules(const QUrl &url);
     bool applyTransformURLRules(QUrl &url);
-    void addBlockRule(const QString& r);
-    void addTransformRule(const QString& r);
+    bool addBlockRule(const QString& r);
+    bool addTransformRule(const QString& r);
 
 private slots:
     void manageQuery();

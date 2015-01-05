@@ -100,13 +100,13 @@ QStringList FilterProxy::cleanRules(const QStringList &l, bool deleteHttpPrefix)
     return ret;
 }
 
-void FilterProxy::addBlockRule(const QString& r) {
+bool FilterProxy::addBlockRule(const QString& r) {
         QString rule = cleanRule(r);
 
         if (rule.isEmpty())
         {
             qDebug() << "Incorrect block rule skipped";
-            return;
+            return false;
         }
 
         if (!blockRules.contains(rule))
@@ -114,15 +114,16 @@ void FilterProxy::addBlockRule(const QString& r) {
             blockRules += rule;
             qDebug() << "Block rule added:" << rule;
         }
+        return true;
 }
 
-void FilterProxy::addTransformRule(const QString& r) {
+bool FilterProxy::addTransformRule(const QString& r) {
         QStringList ruleParts = cleanRules(r.split(" "), false);
 
         if (ruleParts.count() != 2 || ruleParts[0].isEmpty() || ruleParts[1].isEmpty())
         {
             qDebug() << "Incorrect transform rule skipped";
-            return;
+            return false;
         }
 
         QPair<QString, QString> rule = QPair<QString, QString>(ruleParts[0], ruleParts[1]);
@@ -132,21 +133,21 @@ void FilterProxy::addTransformRule(const QString& r) {
             transformRules += rule;
             qDebug() << "Transform rule added:" << ruleParts[0] << " -> " + ruleParts[1];
         }
+        return true;
 }
 
-void FilterProxy::addRule(RuleType::type type, const QString &r) {
+bool FilterProxy::addRule(RuleType::type type, const QString &r) {
     switch (type)
     {
     case RuleType::block:
-        addBlockRule(r);
-        break;
+        return addBlockRule(r);
     case RuleType::transform:
-        addTransformRule(r);
-        break;
+        return addTransformRule(r);
     default:
         qDebug() << "Unhandled rule type";
         break;
     }
+    return false;
 }
 
 void FilterProxy::addRules(RuleType::type type, const QStringList &rules) {
