@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QTimer>
+#include "filterproxy.h"
 
 namespace Ui {
 class addoption;
@@ -15,10 +16,12 @@ class addoption : public QWidget
 public:
     explicit addoption(QWidget *parent = 0);
     ~addoption();
+    void setFilterProxy(FilterProxy*);
 
 private:
     Ui::addoption *ui;
     QTimer timer;
+    FilterProxy *filterproxy;
 
 private slots:
     void saveOption();

@@ -7,6 +7,9 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     reset();
+    ui->widget->setFilterProxy(&filterproxy);
+    ui->widget_2->setFilterProxy(&filterproxy);
+    ui->widget_3->setFilterProxy(&filterproxy);
     ui->widget->show();
     connect(ui->actionView_packets, SIGNAL(triggered()), this, SLOT(showViewPackets()));
     connect(ui->actionView_options, SIGNAL(triggered()), this, SLOT(showOptions()));

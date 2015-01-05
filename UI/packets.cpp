@@ -1,3 +1,4 @@
+#include <QtNetwork>
 #include "packets.h"
 #include "ui_packets.h"
 
@@ -62,4 +63,9 @@ void packets::resendPacket()
         qDebug() << "Packet send again : " << item->text();
     else
         qDebug() << "Nothing selected";
+}
+
+void packets::setFilterProxy(FilterProxy *f)
+{
+    filterproxy = f;
 }

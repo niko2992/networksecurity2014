@@ -35,3 +35,8 @@ void addoption::clearLbl()
 {
     ui->msg->setText("");
 }
+
+void addoption::setFilterProxy(FilterProxy *f)
+{
+    filterproxy = f;
+}

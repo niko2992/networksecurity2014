@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QTextEdit>
+#include "filterproxy.h"
 
 namespace Ui {
 class options;
@@ -16,9 +17,11 @@ public:
     explicit options(QWidget *parent = 0);
     ~options();
     static QStringList opts;
+    void setFilterProxy(FilterProxy*);
 
 private:
     Ui::options *ui;
+    FilterProxy *filterproxy;
 
 private slots:
     void affList();

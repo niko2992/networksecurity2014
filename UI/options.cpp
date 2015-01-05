@@ -27,3 +27,8 @@ void options::affList()
         txt += options::opts.at(i) + "\n";
     ui->optionsDisplay->setText(txt);
 }
+
+void options::setFilterProxy(FilterProxy *f)
+{
+    filterproxy = f;
+}

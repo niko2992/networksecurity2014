@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -16,13 +16,15 @@ SOURCES += main.cpp \
     mainwindow.cpp \
     options.cpp \
     packets.cpp \
-    addoption.cpp
+    addoption.cpp \
+    ../libfilterproxy/filterproxy.cpp
 
 HEADERS  += \
     mainwindow.h \
     options.h \
     packets.h \
-    addoption.h
+    addoption.h \
+    ../libfilterproxy/filterproxy.h
 
 FORMS    += \
     mainwindow.ui \
@@ -32,3 +34,5 @@ FORMS    += \
 
 RESOURCES += \
     img/ui.qrc
+
+INCLUDEPATH +=  ../libfilterproxy

@@ -5,6 +5,7 @@
 #include <QListWidgetItem>
 #include <QTimer>
 #include <QFlags>
+#include "filterproxy.h"
 
 namespace Ui {
 class packets;
@@ -17,10 +18,12 @@ class packets : public QWidget
 public:
     explicit packets(QWidget *parent = 0);
     ~packets();
+    void setFilterProxy(FilterProxy*);
 
 private:
     Ui::packets *ui;
     QTimer timer;
+    FilterProxy *filterproxy;
 
 private slots:
     void showPackets();

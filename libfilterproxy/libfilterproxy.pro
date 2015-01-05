@@ -15,8 +15,8 @@ OTHER_FILES += \
     libssl.a
 
 unix:  LIBS += -lssl
-win32: LIBS += "C:\Users\ce-nicolas.brochard\Desktop\Perso\Formation\Network security\GIT\filterproxy\libssl.a"
+win32: LIBS += -L.\libssl.a
 #.\libssl.a
 
-TARGET  = filterproxy
+TARGET  = libfilterproxy
 DESTDIR = ../lib
