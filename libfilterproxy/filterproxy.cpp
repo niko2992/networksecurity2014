@@ -205,10 +205,12 @@ void FilterProxy::processQuery() {
     if (!url.isValid()) {
         qWarning() << "Invalid URL:" << url;
         socket->disconnectFromHost();
+        emit ignoredRequest(method, address, "Invalid url");
         return;
     }
     if (applyBlockURLRules(url)) {
         socket->disconnectFromHost();
+        emit ignoredRequest(method, address, "Blocked url");
         return;
     }
 
@@ -223,6 +225,7 @@ void FilterProxy::processQuery() {
 
     QTcpSocket* proxySocket = socketFromUrl(socket, url);
 
+    emit receivedRequest(method, address, url.toEncoded());
     if (proxySocket)
     {
         proxySocket->setProperty("url", url);
