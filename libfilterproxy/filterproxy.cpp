@@ -155,6 +155,16 @@ void FilterProxy::addRules(RuleType::type type, const QStringList &rules) {
         addRule(type, rule);
 }
 
+QStringList FilterProxy::getBlockRules()
+{
+    return blockRules;
+}
+
+QList<QPair<QString, QString> > FilterProxy::getTransformRules()
+{
+    return transformRules;
+}
+
 void FilterProxy::manageQuery() {
     //qDebug() << "new connection";
     QTcpServer *proxyServer = qobject_cast<QTcpServer*>(sender());

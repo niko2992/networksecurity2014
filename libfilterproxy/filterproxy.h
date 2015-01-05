@@ -52,6 +52,8 @@ public:
 
     bool addRule(RuleType::type type, const QString &r);
     void addRules(RuleType::type type, const QStringList &rules);
+    QStringList getBlockRules();
+    QList<QPair<QString, QString> > getTransformRules();
 
 signals:
     void receivedRequest(QByteArray method, QByteArray url, QByteArray transformedUrl);

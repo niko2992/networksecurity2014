@@ -16,7 +16,6 @@ class options : public QWidget
 public:
     explicit options(QWidget *parent = 0);
     ~options();
-    static QStringList opts;
     void setFilterProxy(FilterProxy*);
 
 private:
