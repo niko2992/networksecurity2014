@@ -53,9 +53,15 @@ public:
     void addRule(RuleType::type type, const QString &r);
     void addRules(RuleType::type type, const QStringList &rules);
 
+signals:
+    void receivedRequest(QByteArray method, QByteArray url, QByteArray transformedUrl);
+    void ignoredRequest (QByteArray method, QByteArray url, QByteArray reason);
+
 private:
     bool applyBlockURLRules(const QUrl &url);
     bool applyTransformURLRules(QUrl &url);
+    void addBlockRule(const QString& r);
+    void addTransformRule(const QString& r);
 
 private slots:
     void manageQuery();

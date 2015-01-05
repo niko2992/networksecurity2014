@@ -100,11 +100,7 @@ QStringList FilterProxy::cleanRules(const QStringList &l, bool deleteHttpPrefix)
     return ret;
 }
 
-void FilterProxy::addRule(RuleType::type type, const QString &r) {
-    switch (type)
-    {
-    case RuleType::block:
-    {
+void FilterProxy::addBlockRule(const QString& r) {
         QString rule = cleanRule(r);
 
         if (rule.isEmpty())
@@ -118,10 +114,9 @@ void FilterProxy::addRule(RuleType::type type, const QString &r) {
             blockRules += rule;
             qDebug() << "Block rule added:" << rule;
         }
-        break;
-    }
-    case RuleType::transform:
-    {
+}
+
+void FilterProxy::addTransformRule(const QString& r) {
         QStringList ruleParts = cleanRules(r.split(" "), false);
 
         if (ruleParts.count() != 2 || ruleParts[0].isEmpty() || ruleParts[1].isEmpty())
@@ -137,13 +132,20 @@ void FilterProxy::addRule(RuleType::type type, const QString &r) {
             transformRules += rule;
             qDebug() << "Transform rule added:" << ruleParts[0] << " -> " + ruleParts[1];
         }
-        break;
-    }
-    default:
+}
+
+void FilterProxy::addRule(RuleType::type type, const QString &r) {
+    switch (type)
     {
+    case RuleType::block:
+        addBlockRule(r);
+        break;
+    case RuleType::transform:
+        addTransformRule(r);
+        break;
+    default:
         qDebug() << "Unhandled rule type";
         break;
-    }
     }
 }
 
@@ -205,10 +207,12 @@ void FilterProxy::processQuery() {
     if (!url.isValid()) {
         qWarning() << "Invalid URL:" << url;
         socket->disconnectFromHost();
+        emit ignoredRequest(method, address, "Invalid url");
         return;
     }
     if (applyBlockURLRules(url)) {
         socket->disconnectFromHost();
+        emit ignoredRequest(method, address, "Blocked url");
         return;
     }
 
@@ -223,6 +227,7 @@ void FilterProxy::processQuery() {
 
     QTcpSocket* proxySocket = socketFromUrl(socket, url);
 
+    emit receivedRequest(method, address, url.toEncoded());
     if (proxySocket)
     {
         proxySocket->setProperty("url", url);
