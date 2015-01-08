@@ -6,6 +6,7 @@
 #include <QTimer>
 #include <QFlags>
 #include "filterproxy.h"
+#include <QVector>
 
 namespace Ui {
 class packets;
@@ -24,6 +25,7 @@ private:
     Ui::packets *ui;
     QTimer timer;
     FilterProxy *filterproxy;
+    QVector<HttpRequestModel> receivedPackets;
 
 private slots:
     void showPackets();
@@ -31,6 +33,8 @@ private slots:
     void clearPacketList();
     void editPacket(QListWidgetItem*);
     void resendPacket();
+    void receivedRequest(HttpRequestModel);
+    void ignoredRequest(HttpRequestModel,QByteArray reason);
 };
 
 #endif // PACKETS_H

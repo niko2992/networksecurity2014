@@ -1,4 +1,5 @@
 #include "filterproxy.h"
+#include "httprequestmodel.h"
 
 FilterProxy::FilterProxy(QObject *parent) : QObject(parent)
 {
@@ -202,43 +203,30 @@ unsigned short FilterProxy::portFromUrl(const QUrl &url)
 void FilterProxy::processQuery() {
     //qDebug() << "new query";
     QTcpSocket *socket = qobject_cast<QTcpSocket*>(sender());
-    QByteArray requestData = socket->readAll();
+    HttpRequestModel request(socket->readAll());
 
-    int pos = requestData.indexOf("\r\n");
-    QByteArray requestLine = requestData.left(pos);
-    requestData.remove(0, pos + 2);
-
-    QList<QByteArray> entries = requestLine.split(' ');
-    QByteArray method = entries.value(0);
-    QByteArray address = entries.value(1);
-    QByteArray version = entries.value(2);
-
-    //QUrl url = QUrl::fromEncoded(address);
-    QUrl url = QUrl::fromUserInput(address);
+    QUrl url = QUrl::fromUserInput(request.url);
     if (!url.isValid()) {
         qWarning() << "Invalid URL:" << url;
         socket->disconnectFromHost();
-        emit ignoredRequest(method, address, "Invalid url");
+        emit ignoredRequest(request, "Invalid url");
         return;
     }
     if (applyBlockURLRules(url)) {
         socket->disconnectFromHost();
-        emit ignoredRequest(method, address, "Blocked url");
+        emit ignoredRequest(request, "Blocked url");
         return;
     }
 
     applyTransformURLRules(url);
+    request.transformedUrl = url.toEncoded();
 
     qDebug() << "Proxying URL:" << url;
 
-    QByteArray req = url.toEncoded();
-
-    requestLine = method + " " + req + " " + version + "\r\n";
-    requestData.prepend(requestLine);
-
+    QByteArray  requestData = request.toByteArray();
     QTcpSocket* proxySocket = socketFromUrl(socket, url);
 
-    emit receivedRequest(method, address, url.toEncoded());
+    emit receivedRequest(request);
     if (proxySocket)
     {
         proxySocket->setProperty("url", url);

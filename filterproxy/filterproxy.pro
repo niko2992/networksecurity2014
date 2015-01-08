@@ -19,5 +19,5 @@ FILTER_FILES = block.txt transform.txt
 
 for(FILE,FILTER_FILES) {
   unix:  QMAKE_POST_LINK += $$quote(cp $${PWD}/$${FILE} $${OUT_PWD}$$escape_expand(\n\t))
-  win32: QMAKE_POST_LINK +=$$quote(cmd /c copy /y $${PWD}\$${FILE} $${OUT_PWD}$$escape_expand(\n\t))
+  win32: QMAKE_POST_LINK += $$quote(cmd /c copy /y $${PWD}\$${FILE} $${OUT_PWD}$$escape_expand(\n\t))
 }

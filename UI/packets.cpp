@@ -1,6 +1,7 @@
 #include <QtNetwork>
 #include "packets.h"
 #include "ui_packets.h"
+#include <QDebug>
 
 packets::packets(QWidget *parent) :
     QWidget(parent),
@@ -21,9 +22,10 @@ packets::~packets()
     delete ui;
 }
 
-static bool started = false;
 void packets::startStop()
 {
+    static bool started = false;
+
     if (started)
     {
         timer.stop();
@@ -38,16 +40,14 @@ void packets::startStop()
     }
 }
 
-static int i = 0;
 void packets::showPackets()
 {
-   ui->packetList->insertItem(0, "test" + QString::number(i));
-   i++;
 }
 
 void packets::clearPacketList()
 {
     ui->packetList->clear();
+    receivedPackets.clear();
 }
 
 void packets::editPacket(QListWidgetItem *item)
@@ -55,17 +55,38 @@ void packets::editPacket(QListWidgetItem *item)
     item->setFlags(item->flags() | Qt::ItemIsEditable);
 }
 
-#include <QDebug>
 void packets::resendPacket()
 {
-    QListWidgetItem* item = ui->packetList->currentItem();
-    if (item)
-        qDebug() << "Packet send again : " << item->text();
-    else
-        qDebug() << "Nothing selected";
+    if (ui->packetList->currentItem() != 0)
+    {
+      int row = ui->packetList->currentRow();
+      const HttpRequestModel& request = receivedPackets.at(row);
+      QString line = ui->packetList->currentItem()->text();
+
+      if (line.indexOf("| BLOCKED") != -1)
+      {
+        // Ce paquet a été bloqué, on peut pas le renvoyer ?
+        return ;
+      }
+      request.toByteArray();
+    }
 }
 
 void packets::setFilterProxy(FilterProxy *f)
 {
     filterproxy = f;
+    connect(filterproxy, SIGNAL(receivedRequest(HttpRequestModel)), this, SLOT(receivedRequest(HttpRequestModel)));
+    connect(filterproxy, SIGNAL(ignoredRequest(HttpRequestModel,QByteArray)), this, SLOT(ignoredRequest(HttpRequestModel,QByteArray)));
+}
+
+void packets::receivedRequest(HttpRequestModel request)
+{
+    ui->packetList->insertItem(0, request.requestLine());
+    receivedPackets.insert(0, request);
+}
+
+void packets::ignoredRequest(HttpRequestModel request, QByteArray reason)
+{
+    ui->packetList->insertItem(0, request.requestLine() + " | BLOCKED: " + reason);
+    receivedPackets.insert(0, request);
 }

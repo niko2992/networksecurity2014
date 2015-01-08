@@ -20,6 +20,7 @@
 */
 
 #include <QtNetwork>
+#include "httprequestmodel.h"
 #define PROXY_DEFAULT_PORT 8080
 
 struct RuleType {
@@ -56,8 +57,8 @@ public:
     QList<QPair<QString, QString> > getTransformRules();
 
 signals:
-    void receivedRequest(QByteArray method, QByteArray url, QByteArray transformedUrl);
-    void ignoredRequest (QByteArray method, QByteArray url, QByteArray reason);
+    void receivedRequest(HttpRequestModel);
+    void ignoredRequest (HttpRequestModel, QByteArray reason);
 
 private:
     bool applyBlockURLRules(const QUrl &url);

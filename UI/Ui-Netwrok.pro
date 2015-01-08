@@ -17,14 +17,16 @@ SOURCES += main.cpp \
     options.cpp \
     packets.cpp \
     addoption.cpp \
-    ../libfilterproxy/filterproxy.cpp
+    ../libfilterproxy/filterproxy.cpp \
+    ../libfilterproxy/httprequestmodel.cpp
 
 HEADERS  += \
     mainwindow.h \
     options.h \
     packets.h \
     addoption.h \
-    ../libfilterproxy/filterproxy.h
+    ../libfilterproxy/filterproxy.h \
+    ../libfilterproxy/httprequestmodel.h
 
 FORMS    += \
     mainwindow.ui \

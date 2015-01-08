@@ -15,10 +15,10 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-    FilterProxy filterproxy;
 
 private:
-    Ui::MainWindow *ui;
+    Ui::MainWindow* ui;
+    FilterProxy*    filterproxy;
 
 private slots:
     void showViewPackets();

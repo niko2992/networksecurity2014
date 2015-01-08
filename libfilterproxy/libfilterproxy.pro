@@ -1,7 +1,8 @@
 TEMPLATE = lib
 
 SOURCES = filterproxy.cpp \
-    filterproxyapp.cpp
+    filterproxyapp.cpp \
+    httprequestmodel.cpp
 
 QT += network
 
@@ -9,7 +10,8 @@ CONFIG += c++11
 
 HEADERS += \
     filterproxy.h \
-    filterproxyapp.h
+    filterproxyapp.h \
+    httprequestmodel.h
 
 OTHER_FILES += \
     libssl.a
