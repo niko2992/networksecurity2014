@@ -2,6 +2,7 @@
 #include "packets.h"
 #include "ui_packets.h"
 #include <QDebug>
+#include <QTcpSocket>
 
 packets::packets(QWidget *parent) :
     QWidget(parent),
@@ -60,16 +61,29 @@ void packets::resendPacket()
     if (ui->packetList->currentItem() != 0)
     {
       int row = ui->packetList->currentRow();
+      unsigned short port = 80;
       const HttpRequestModel& request = receivedPackets.at(row);
       QString line = ui->packetList->currentItem()->text();
+      QTcpSocket* socket = new QTcpSocket(this);
 
-      if (line.indexOf("| BLOCKED") != -1)
-      {
-        // Ce paquet a été bloqué, on peut pas le renvoyer ?
-        return ;
-      }
-      request.toByteArray();
+      if (request.transformedUrl.port() < 0)
+        port = request.transformedUrl.port();
+      socket->connectToHost(request.transformedUrl.host(), port);
+      socket->write(request.toByteArray());
+      connect(socket, SIGNAL(readyRead()), this, SLOT(resentPacketResponse()));
+      //connect(socket, SIGNAL(connected()), this, SLOT(resentPacketResponse()));
+      //connect(socket, SIGNAL(disconnected()), this, SLOT(resentPacketResponse()));
+      connect(socket, SIGNAL(disconnected()), socket, SLOT(deleteLater()));
+      qDebug() << "Packet successfully resent";
     }
+}
+
+void packets::resentPacketResponse()
+{
+    qDebug() << "Received resent response";
+    QTcpSocket* socket = qobject_cast<QTcpSocket*>(sender());
+
+    qDebug() << socket->readAll();
 }
 
 void packets::setFilterProxy(FilterProxy *f)

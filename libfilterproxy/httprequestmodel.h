@@ -2,6 +2,7 @@
 #define HTTPREQUESTMODEL_H
 
 #include <QByteArray>
+#include <QUrl>
 
 struct HttpRequestModel
 {
@@ -10,7 +11,7 @@ public:
     HttpRequestModel(QByteArray source);
 
     QByteArray method, url, version, body;
-    QByteArray transformedUrl;
+    QUrl transformedUrl;
 
     QByteArray toByteArray() const;
     QByteArray requestLine() const;

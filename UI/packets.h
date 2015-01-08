@@ -35,6 +35,7 @@ private slots:
     void resendPacket();
     void receivedRequest(HttpRequestModel);
     void ignoredRequest(HttpRequestModel,QByteArray reason);
+    void resentPacketResponse();
 };
 
 #endif // PACKETS_H

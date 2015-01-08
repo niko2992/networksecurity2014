@@ -219,7 +219,7 @@ void FilterProxy::processQuery() {
     }
 
     applyTransformURLRules(url);
-    request.transformedUrl = url.toEncoded();
+    request.transformedUrl = url;
 
     qDebug() << "Proxying URL:" << url;
 

@@ -21,5 +21,5 @@ QByteArray HttpRequestModel::toByteArray() const {
 }
 
 QByteArray HttpRequestModel::requestLine() const {
-    return method + ' ' + transformedUrl + ' ' + version;
+    return method + ' ' + transformedUrl.toEncoded() + ' ' + version;
 }
